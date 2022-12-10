@@ -1,0 +1,2 @@
+# MCAJNLP
+Minecraft Applet JNLP
