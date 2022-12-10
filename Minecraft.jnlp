@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <jnlp spec="1.6+" codebase="." herf="Start.jnlp">
 <information>
-    <title>Minecraft Classic JNLP Edition, Development Mode</title>
+    <title>Minecraft Classic JNLP Edition, version: beta0</title>
     <vendor>Markus Persson</vendor>
     <homepage herf="http://mc.classic.com/minecraft/"/>
     <offline-allowed/>
@@ -14,20 +14,20 @@
 </resources>
 <resources>
     <j2se version="1.6+"/>
-    <jar href="lwjgl_util_applet.jar"/>
-    <jar href="lzma.jar"/>
+    <jar href="LWJGL/lwjgl_util_applet.jar"/>
+    <jar href="LWJGL/lzma.jar"/>
 </resources>
 <applet-desc name="Minecraft Classic" main-class="org.lwjgl.util.applet.AppletLoader" width="854" height="480">
-    <param name="al_title" value="Minecraft_Classic_0.0.22a_05"/>
+    <param name="al_title" value="Minecraft_Classic_0.0.23a_01"/>
     <param name="al_main" value="com.mojang.minecraft.MinecraftApplet"/>
-    <param name="al_logo" value="logo_small.png"/>
-    <param name="al_progressbar" value="appletprogress.gif"/>
+    <param name="al_logo" value="bg/logo_small.png"/>
+    <param name="al_progressbar" value="bg/appletprogress.gif"/>
     <param name="al_cache" value="false"/>
-    <param name="al_jars" value="lwjgl.jar.pack.lzma, jinput.jar.pack.lzma, lwjgl_util.jar.pack.lzma, minecraft.jar"/>
-    <param name="al_windows" value="windows_natives.jar.lzma"/>
-    <param name="al_linux" value="linux_natives.jar.lzma"/>
-    <param name="al_mac" value="macosx_natives.jar.lzma"/>
-    <param name="al_solaris" value="solaris_natives.jar.lzma"/>
+    <param name="al_jars" value="LWJGL/lwjgl.jar.pack.lzma, LWJGL/jinput.jar.pack.lzma, LWJGL/lwjgl_util.jar.pack.lzma, bin/minecraft.jar"/>
+    <param name="al_windows" value="LWJGL/windows_natives.jar.lzma"/>
+    <param name="al_linux" value="LWJGL/linux_natives.jar.lzma"/>
+    <param name="al_mac" value="LWJGL/macosx_natives.jar.lzma"/>
+    <param name="al_solaris" value="LWJGL/solaris_natives.jar.lzma"/>
     <param name="al_debug" value="false"/>
     <param name="al_version" value="0.1"/>
     <param name="codebase_lookup" value="false"/>
