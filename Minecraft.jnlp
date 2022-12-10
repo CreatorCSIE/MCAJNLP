@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <jnlp spec="1.6+" codebase="." herf="Start.jnlp">
 <information>
-    <title>Minecraft Classic JNLP Edition, version: beta0</title>
+    <title>Minecraft Classic JNLP Edition, Development Mode</title>
     <vendor>Markus Persson</vendor>
     <homepage herf="http://mc.classic.com/minecraft/"/>
     <offline-allowed/>
