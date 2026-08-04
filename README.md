@@ -24,8 +24,8 @@
 
 请自行准备或提取您的 Minecraft 历史版本 `.jar` 文件，并将其放置在 `bin/` 目录下对应的子文件夹中：
 
-- **Classic JAR**：放置于 `bin/classic/`（例如 `bin/classic/c0.0.22a_05.jar`） [2]
-- **Indev JAR**：放置于 `bin/indev/`（例如 `bin/indev/in-20100223.jar`） [2]
+- **Classic JAR**：放置于 `bin/classic/`（例如 `bin/classic/c0.0.22a_05.jar`） 
+- **Indev JAR**：放置于 `bin/indev/`（例如 `bin/indev/in-20100223.jar`） 
 - **Infdev JAR**：放置于 `bin/infdev/`
 - **Alpha JAR**：放置于 `bin/alpha/`
 - **Beta JAR**：放置于 `bin/beta/`
@@ -70,7 +70,7 @@ dotnet run --project src/MCAJNLP.csproj
 ### 2. 普通玩家使用 (Run Precompiled Release)
 1. 前往 [Releases 页面](https://github.com/CreatorCSIE/MCAJNLP/releases) 下载适合您系统架构的最新压缩包。
 2. 解压压缩包到本地任意目录（路径最好不要含有中文或特殊字符）。
-3. 按照 [【客户端 JAR 包放置指引】](#-客户端-jar-包放置指引-client-jar-placement) 将游戏 JAR 放入对应的 `bin/` 子目录 [2]。
+3. 按照 [【客户端 JAR 包放置指引】](#-客户端-jar-包放置指引-client-jar-placement) 将游戏 JAR 放入对应的 `bin/` 子目录。
 4. 双击运行 `MCAJNLP.exe`（Windows）或执行 `./MCAJNLP`（Linux）。
 5. 在 GUI 界面中选择您想体验的版本，输入离线游戏 ID，点击 **【启动 / Launch】** 即可。
 
@@ -82,9 +82,9 @@ dotnet run --project src/MCAJNLP.csproj
 由于 Java 默认的沙箱机制对本地文件读写与网络套接字（Socket）有严格限制，需要手动修改 Java 本地配置文件 `java.policy`：
 
 - **文件路径**：
-  - **64位 OS / 64位 Java**：`C:\Program Files\Java\<你的Java版本>\lib\security\java.policy` [2]
-  - **32位 Java**：`C:\Program Files (x86)\Java\<你的Java版本>\lib\security\java.policy` [2]
-  - **Linux**：`/usr/lib/jvm/<你的Java版本>/lib/security/java.policy` [2]
+  - **64位 OS / 64位 Java**：`C:\Program Files\Java\<你的Java版本>\lib\security\java.policy`
+  - **32位 Java**：`C:\Program Files (x86)\Java\<你的Java版本>\lib\security\java.policy`
+  - **Linux**：`/usr/lib/jvm/<你的Java版本>/lib/security/java.policy`
 
 - **修改方法**：使用管理员权限打开该文件，在大括号 `grant { ... };` 内的末尾追加以下两行权限声明：
   ```text
