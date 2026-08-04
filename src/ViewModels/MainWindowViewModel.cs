@@ -245,8 +245,8 @@ namespace MCAJNLP.ViewModels
             string vmArgs = "-Xmx800M -XX:MaxDirectMemorySize=1024M -Djava.util.Arrays.useLegacyMergeSort=true -Dsun.java2d.uiScale.enabled=false -Dsun.java2d.dpiaware=false -Dorg.lwjgl.util.NoChecks=true";
             string fixArgs = "-Dhttp.proxyHost=betacraft.uk -Dhttp.proxyPort=11702 -Dhttp.nonProxyHosts=api.betacraft.uk|files.betacraft.uk -Dsun.java2d.noddraw=true -Dsun.awt.noerasebackground=true -Dsun.java2d.d3d=false -Dsun.java2d.opengl=false -Dsun.java2d.pmoffscreen=false -Djava.net.useSystemProxies=false";
 
-            string finalServerIp = null;
-            string finalServerPort = null;
+            string finalServerIp = string.Empty;
+            string finalServerPort = string.Empty;
             if (IsMultiplayerEnabled)
             {
                 finalServerIp = ServerIp;
@@ -254,8 +254,8 @@ namespace MCAJNLP.ViewModels
             }
             else
             {
-                finalServerIp = null;
-                finalServerPort = null;
+                finalServerIp = string.Empty;
+                finalServerPort = string.Empty;
                 Debug.WriteLine("[Security Check] 当前非多人版本，已自动截断拦截 IP/Port 联机参数。");
             }
             string multiParams = "";
@@ -534,7 +534,7 @@ namespace MCAJNLP.ViewModels
                 HasHuman = HasHuman ? true : false,
                 HasBlockMenu = HasBlockMenu ? true : false,
                 HasSetSpawn = HasSetSpawn ? true : false,
-                InventoryKey = HasInventory ? InventoryKey : null,
+                InventoryKey = HasInventory ? InventoryKey : string.Empty,
                 HasDrop = HasDrop ? true : false,
                 HasSneak = HasSneak ? true : false
             };
@@ -605,7 +605,7 @@ namespace MCAJNLP.ViewModels
             HasSneak = false;
             
             // 3. 额外项置空
-            InventoryKey = null;
+            InventoryKey = string.Empty;
             // 4. ⭐ 极其重要：重置后更新“删除”按钮的状态（使其变为不可用）
             OnPropertyChanged(nameof(IsExistingVersion)); 
             // 如果是 Code-behind 则执行：BtnDelete.IsEnabled = false;

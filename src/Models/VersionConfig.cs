@@ -44,7 +44,7 @@ namespace MCAJNLP.Models
         public bool HasSetSpawn { get; set; }
 
         [JsonPropertyName("inventory_key")]
-        public string InventoryKey { get; set; }
+        public string InventoryKey { get; set; } = string.Empty;
 
         [JsonPropertyName("has_drop")]
         public bool HasDrop { get; set; }
