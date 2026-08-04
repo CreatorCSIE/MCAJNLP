@@ -75,5 +75,6 @@ jobs:
       uses: softprops/action-gh-release@v2
       with:
         files: MinecraftAppletJNLP-.NET.zip
+        draft: true
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
