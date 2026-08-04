@@ -1,3 +1,8 @@
+> [!IMPORTANT]
+> **系统兼容性提示**：本软件目前仅支持 **Windows** 系统。Linux 平台的移植工作正在紧张进行中，敬请期待！
+>
+> *Compatibility Notice: Currently, this software only supports **Windows**. The Linux port is actively in progress!*
+
 # MCAJNLP - Minecraft Applet JNLP 离线启动器
 
 `MCAJNLP` 是一个基于 .NET 与 **Avalonia UI** 跨平台框架开发的、致力于高度还原与离线启动 Minecraft 早期历史版本 JNLP (Java Network Launch Protocol) 与 Applet 运行体验的桌面启动器客户端。
@@ -67,12 +72,21 @@ cd MCAJNLP
 dotnet run --project src/MCAJNLP.csproj
 ```
 
-### 2. 普通玩家使用 (Run Precompiled Release)
+### 2. 普通玩家使用教程 (Run Precompiled Release)
 1. 前往 [Releases 页面](https://github.com/CreatorCSIE/MCAJNLP/releases) 下载适合您系统架构的最新压缩包。
 2. 解压压缩包到本地任意目录（路径最好不要含有中文或特殊字符）。
 3. 按照 [【客户端 JAR 包放置指引】](#-客户端-jar-包放置指引-client-jar-placement) 将游戏 JAR 放入对应的 `bin/` 子目录。
 4. 双击运行 `MCAJNLP.exe`（Windows）或执行 `./MCAJNLP`（Linux）。
 5. 在 GUI 界面中选择您想体验的版本，输入离线游戏 ID，点击 **【启动 / Launch】** 即可。
+
+---
+
+## 🌐 Localization / 国际化与多语言支持
+
+本项目（包含启动器页面与文档）随时欢迎社区提供多语言本地化（i18n）与翻译支持！  
+*This repository, launcher UI, and documentation welcome community contributions for localization (i18n) and translations at any time!*
+
+如果你希望为本项目贡献其他语言（如 English、繁體中文等）的 README 文档或界面翻译，欢迎随时提交 **Pull Request** 或开 **Issue** 讨论！
 
 ---
 
