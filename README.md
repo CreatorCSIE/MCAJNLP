@@ -1,4 +1,3 @@
-```markdown
 # MCAJNLP - Minecraft Applet JNLP 离线启动器
 
 `MCAJNLP` 是一个基于 .NET 与 **Avalonia UI** 跨平台框架开发的、致力于高度还原与离线启动 Minecraft 早期历史版本 JNLP (Java Network Launch Protocol) 与 Applet 运行体验的桌面启动器客户端。
