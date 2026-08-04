@@ -120,4 +120,3 @@ dotnet run --project src/MCAJNLP.csproj
 - **第三方资产与商标免责声明**：
   - 本仓库仅包含 LWJGL 基础库、启动器配置及 C# 客户端源码，**不包含、不分发任何官方 Minecraft 游戏 `.jar` 客户端包或音效资源**。
   - 本项目所涉及的 Minecraft 游戏资产、商标与品牌版权均归 **Mojang Studios / Microsoft** 所有。
-```
