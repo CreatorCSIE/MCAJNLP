@@ -1,0 +1,78 @@
+name: Build and Test (Dev)
+
+# 触发条件：当向 dev 分支推送（push）代码，或者向 dev 提交合并请求（PR）时触发
+on:
+  push:
+    branches:
+      - dev
+  pull_request:
+    branches:
+      - dev
+
+jobs:
+  build:
+    name: Test Build on Dev
+    runs-on: windows-latest
+
+    steps:
+    # 1. 检出代码
+    - name: Checkout Code
+      uses: actions/checkout@v4
+
+    # 2. 安装 .NET SDK
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: '9.0.x'
+
+    # 3. 恢复依赖（修正：显式指定项目路径）
+    - name: Restore dependencies
+      run: dotnet restore src/MCAJNLP.csproj # 👈 修改了这里
+
+    # 4. 发布（编译并输出到 build 目录）
+    - name: Publish App
+      run: |
+        dotnet publish src/MCAJNLP.csproj -c Release -r win-x64 --self-contained true -o build/
+
+    # 5. 整理目录结构（提取文件至根目录，清理无用源码和临时文件夹）
+    - name: Organize files and Clean up
+      shell: pwsh
+      run: |
+        # 1) 将 build 目录下的所有编译产物（文件和子文件夹）提取移动到项目根目录
+        Get-ChildItem -Path build\* -Force | Move-Item -Destination . -Force
+        
+        # 2) 删除空的或不需要的 build 临时文件夹
+        Remove-Item -Path build -Recurse -Force -ErrorAction SilentlyContinue
+        
+        # 3) 删除源代码 src 文件夹，避免混入发布包
+        Remove-Item -Path src -Recurse -Force -ErrorAction SilentlyContinue
+        
+        # 4) 删除解决方案文件（*.sln，如果有的话）
+        Remove-Item -Path *.sln -Force -ErrorAction SilentlyContinue
+        
+        # 5) 解除 .git 文件夹中文件的只读属性并彻底删除（防止版本控制历史占用空间）
+        if (Test-Path .git) {
+          Get-ChildItem -Path .git -Recurse -Force | ForEach-Object { $_.Attributes = 'Normal' }
+          Remove-Item -Path .git -Recurse -Force -ErrorAction SilentlyContinue
+        }
+        
+        # 6) 删除 GitHub 工作流配置和忽略规则文件
+        Remove-Item -Path .github -Recurse -Force -ErrorAction SilentlyContinue
+        Remove-Item -Path .gitignore -Force -ErrorAction SilentlyContinue
+
+    # 6. 压缩整站（此时根目录下只剩下纯净的编译产物，以及 LICENSE/README 等说明文件）
+    - name: Compress Build Artifacts
+      shell: pwsh
+      run: |
+        # 技巧：先打包到上一级临时目录，防止 zip 压缩包把自己也重复打包进去
+        Compress-Archive -Path * -DestinationPath ../MinecraftAppletJNLP-.NET.zip -Force
+        # 再将打包好的 zip 移回当前根目录，方便后续步骤读取
+        Move-Item -Path ../MinecraftAppletJNLP-.NET.zip -Destination . -Force
+
+    # 7. 上传为 GitHub Artifact
+    - name: Upload Build Artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: MinecraftAppletJNLP-Dev-Build
+        path: MinecraftAppletJNLP-.NET.zip # 直接读取根目录下的压缩包
+        retention-days: 14

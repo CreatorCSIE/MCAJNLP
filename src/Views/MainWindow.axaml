@@ -1,0 +1,349 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:svg="clr-namespace:Avalonia.Svg.Skia;assembly=Avalonia.Svg.Skia"
+        xmlns:vm="using:MCAJNLP.ViewModels"
+        x:Class="MCAJNLP.Views.MainWindow"
+        x:DataType="vm:MainWindowViewModel"
+        Icon="/favicon.ico"
+        Title="Minecraft Applet JNLP 离线启动器"
+        Width="1050" Height="680"
+        Foreground="#e0d0d0"
+        FontFamily="Microsoft YaHei, sans-serif">
+
+    <!-- 全局泥土平铺背景 -->
+    <Window.Background>
+        <ImageBrush Source="avares://MCAJNLP/style/bg.gif" TileMode="Tile" DestinationRect="0,0,64,64" />
+    </Window.Background>
+
+    <Window.Styles>
+        <!-- 启动游戏绿色按钮样式 -->
+        <Style Selector="Button.retro-launch">
+            <Setter Property="Background" Value="#28a745"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="Padding" Value="15,6"/>
+        </Style>
+        <Style Selector="Button.retro-launch:pointerover">
+            <Setter Property="Background" Value="#218838"/>
+        </Style>
+
+        <!-- 新增：保存设置深灰色按钮样式 -->
+        <Style Selector="Button.retro-save">
+            <Setter Property="Background" Value="#555555"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="Padding" Value="15,6"/>
+        </Style>
+        <Style Selector="Button.retro-save:pointerover">
+            <Setter Property="Background" Value="#666666"/>
+        </Style>
+    </Window.Styles>
+
+    <DockPanel>
+        <!-- 顶部通栏（岩石平铺背景） -->
+        <Border DockPanel.Dock="Top" Height="60" BorderBrush="Black" BorderThickness="0,0,0,3">
+            <Border.Background>
+                <ImageBrush Source="avares://MCAJNLP/style/top-bg.gif" TileMode="Tile" DestinationRect="0,0,60,60" />
+            </Border.Background>
+            <DockPanel Margin="15,0">
+                <StackPanel Orientation="Horizontal" VerticalAlignment="Center" DockPanel.Dock="Left">
+                    <!-- Minecraft SVG Logo -->
+                    <svg:Svg Path="avares://MCAJNLP/style/logo_small.svg" Height="48" VerticalAlignment="Center" Margin="0,0,15,0"/>
+                    
+                    <!-- 双行经典排版 + 高仿超链接 -->
+                    <StackPanel VerticalAlignment="Center" Spacing="4">
+                        <TextBlock Text="这是 Minecraft Applet 离线 JNLP 桌面启动器 version 1.0" FontSize="13"/>
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="如果你想访问本项目的 GitHub 仓库，请点击 " FontSize="12"/>
+                            <!-- 触发后台点击事件的超链接按钮 -->
+                            <Button Content="这里" 
+                                    Click="OpenGitHub_Click" 
+                                    Foreground="#55A7FF" 
+                                    FontSize="12" 
+                                    Background="Transparent" 
+                                    BorderThickness="0" 
+                                    Padding="0" 
+                                    Cursor="Hand"
+                                    VerticalAlignment="Center">
+                                <Button.Styles>
+                                    <Style Selector="Button:pointerover /template/ ContentPresenter">
+                                        <Setter Property="Background" Value="Transparent"/>
+                                    </Style>
+                                    <Style Selector="Button:pointerover">
+                                        <Setter Property="Foreground" Value="#88C2FF"/>
+                                        <Setter Property="TextBlock.TextDecorations" Value="Underline"/>
+                                    </Style>
+                                </Button.Styles>
+                            </Button>
+                        </StackPanel>
+                    </StackPanel>
+                </StackPanel>
+            </DockPanel>
+        </Border>
+
+        <!-- 版权信息单独提取到最底部，停靠在 DockPanel 的最下方偏右 -->
+        <TextBlock DockPanel.Dock="Bottom" 
+                   Text="Copyright 2026 (c) Hawk. All rights reserved." 
+                   FontSize="11" 
+                   Foreground="Silver" 
+                   HorizontalAlignment="Right" 
+                   Margin="0,0,15,10"/>
+
+        <!-- 标签页选项卡（放置在最后，使其填满中间剩余的所有空间） -->
+        <TabControl Margin="10,10,10,0" Background="Transparent" SelectedIndex="{Binding SelectedTabIndex}">
+            
+            <!-- 选项卡 1：游戏启动器 -->
+            <TabItem Header=" 游戏启动器 " FontSize="14">
+                <Grid RowDefinitions="Auto, *, Auto" Margin="10">
+                    
+                    <!-- 顶部配置面板 -->
+                    <Border Grid.Row="0" Background="#222" BorderBrush="#444" BorderThickness="1" Padding="15" Margin="0,0,0,15">
+                        <WrapPanel HorizontalAlignment="Center" VerticalAlignment="Center">
+                            <StackPanel Orientation="Horizontal" Margin="10,5">
+                                <TextBlock Text="版本: " VerticalAlignment="Center"/>
+                                <ComboBox Width="150" ItemsSource="{Binding VersionKeys}" SelectedItem="{Binding SelectedLaunchKey}"/>
+                            </StackPanel>
+
+                            <StackPanel Orientation="Horizontal" Margin="10,5">
+                                <TextBlock Text="名字: " VerticalAlignment="Center"/>
+                                <TextBox Width="110" Text="{Binding Username}"/>
+                            </StackPanel>
+
+                            <StackPanel Orientation="Horizontal" Margin="10,5">
+                                <TextBlock Text="服务器IP: " VerticalAlignment="Center"/>
+                                <TextBox Width="130" Text="{Binding ServerIp}" Watermark="e.g. 127.0.0.1" IsEnabled="{Binding IsMultiplayerEnabled}"/>
+                            </StackPanel>
+
+                            <StackPanel Orientation="Horizontal" Margin="10,5">
+                                <TextBlock Text="端口: " VerticalAlignment="Center"/>
+                                <TextBox Width="70" Text="{Binding ServerPort}" IsEnabled="{Binding IsMultiplayerEnabled}"/>
+                            </StackPanel>
+
+                            <!-- 操作按钮区 -->
+                            <Button Classes="retro-launch" Content="启动游戏" Command="{Binding LaunchGame}" Margin="15,2,5,2"/>
+                            <!-- 【新增】保存设置按钮 -->
+                            <Button Classes="retro-save" Content="保存设置" Command="{Binding SaveSettings}" Margin="5,2,5,2"/>
+                        </WrapPanel>
+                    </Border>
+
+                    <!-- 下方排版：提示框 + 动态按键提示 -->
+                    <Grid Grid.Row="1" ColumnDefinitions="*, 300">
+                        <Border Grid.Column="0" Background="#111" CornerRadius="4" Margin="0,0,10,0" Padding="20">
+                            <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
+                                <TextBlock Text="ℹ️ Java Web Start 模式" FontSize="16" Foreground="#ff4d4f" HorizontalAlignment="Center" Margin="0,0,0,10"/>
+                                <TextBlock Text="正在使用更轻量级的 javaws.exe 加载游戏本地依赖" HorizontalAlignment="Center" Foreground="#ccc"/>
+                                <TextBlock Text="系统仅需装有标准 Java 8 即可完美运行，无需安装繁重的完整 JDK。" Margin="0,5,0,0" HorizontalAlignment="Center" Foreground="#999"/>
+                            </StackPanel>
+                        </Border>
+
+                        <Border Grid.Column="1" Background="#111" BorderBrush="#444" BorderThickness="1" Padding="15">
+                            <ScrollViewer>
+                                <StackPanel>
+                                    <TextBlock Text="Controls (按键指南):" FontSize="15" FontWeight="Bold" Margin="0,0,0,10"/>
+                                    <TextBlock Text="{Binding ControlsText}" TextWrapping="Wrap" FontSize="12" LineHeight="18" Foreground="#ccc"/>
+                                </StackPanel>
+                            </ScrollViewer>
+                        </Border>
+                    </Grid>
+                </Grid>
+            </TabItem>
+
+            <!-- 选项卡 2：版本参数管理 -->
+            <TabItem Header=" 可视化配置管理 " FontSize="14">
+                <Grid ColumnDefinitions="*, 350" Margin="10">
+                    
+                    <ScrollViewer Grid.Column="0" Padding="0,0,10,0">
+                        <StackPanel Spacing="15">
+                            <TextBlock Text="添加 / 编辑版本属性" FontSize="16" FontWeight="Bold" Foreground="#28a745"/>
+                            
+                            <!-- 表单格网 -->
+                            <Grid ColumnDefinitions="*, *" RowDefinitions="Auto, Auto, Auto, Auto" RowSpacing="12" ColumnSpacing="12">
+                                <StackPanel Grid.Row="0" Grid.Column="0">
+                                    <TextBlock Text="版本 Key (唯一标识符) *" FontSize="12" Margin="0,0,0,4"/>
+                                    <TextBox Text="{Binding VKey}" Watermark="例: c0.0.22a_05"/>
+                                </StackPanel>
+                                <StackPanel Grid.Row="0" Grid.Column="1">
+                                    <TextBlock Text="阶段类型 (Type) *" FontSize="12" Margin="0,0,0,4"/>
+                                    <ComboBox HorizontalAlignment="Stretch" SelectedItem="{Binding VType}">
+                                        <x:String>classic</x:String>
+                                        <x:String>classic_mp</x:String>
+                                        <x:String>indev</x:String>
+                                        <x:String>infdev</x:String>
+                                        <x:String>alpha</x:String>
+                                        <x:String>beta</x:String>
+                                        <x:String>release</x:String>
+                                        <x:String>isom</x:String>
+                                    </ComboBox>
+                                </StackPanel>
+
+                                <StackPanel Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2">
+                                    <TextBlock Text="显示名称 (Display Name)" FontSize="12" Margin="0,0,0,4"/>
+                                    <TextBox Text="{Binding VName}"/>
+                                </StackPanel>
+
+                                <StackPanel Grid.Row="2" Grid.Column="0">
+                                    <TextBlock Text="Applet 标题 (al_title)" FontSize="12" Margin="0,0,0,4"/>
+                                    <TextBox Text="{Binding VTitle}"/>
+                                </StackPanel>
+                                <StackPanel Grid.Row="2" Grid.Column="1">
+                                    <TextBlock Text="主类名 (al_main) *" FontSize="12" Margin="0,0,0,4"/>
+                                    <TextBox Text="{Binding VMainClass}"/>
+                                </StackPanel>
+
+                                <StackPanel Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="2">
+                                    <TextBlock Text="JAR 包相对路径 (jar) *" FontSize="12" Margin="0,0,0,4"/>
+                                    <TextBox Text="{Binding VJar}"/>
+                                </StackPanel>
+                            </Grid>
+
+                            <!-- 补丁开关 -->
+                            <Border BorderBrush="#333" BorderThickness="1" Padding="10" Background="#111">
+                                <StackPanel Spacing="5">
+                                    <TextBlock Text="Applet 引擎补丁设置 (Engine Flags)" FontSize="13" Foreground="#aaa" FontWeight="Bold"/>
+                                    <CheckBox Content="0.0.15a 联机补丁" IsChecked="{Binding Has15aPatch}"/>
+                                    <CheckBox Content="0.30 免正版验证 (haspaid)" IsChecked="{Binding HasPaid}"/>
+                                    <CheckBox Content="高 DPI 修复 (仅 0.0.12a__03 之前)" IsChecked="{Binding DpiFix}"/>
+                                </StackPanel>
+                            </Border>
+
+                            <!-- 操作指南按键设置 -->
+                            <Border BorderBrush="#333" BorderThickness="1" Padding="10" Background="#111">
+                                <StackPanel Spacing="5">
+                                    <TextBlock Text="按键指南显示设置 (Controls Settings)" FontSize="13" Foreground="#aaa" FontWeight="Bold"/>
+                                    <Grid ColumnDefinitions="*,*">
+                                        <StackPanel Grid.Column="0" Spacing="2">
+                                            <CheckBox Content="G 键生成小人" IsChecked="{Binding HasHuman}"/>
+                                            <CheckBox Content="B 键方块菜单" IsChecked="{Binding HasBlockMenu}"/>
+                                            <CheckBox Content="Enter 设出生点" IsChecked="{Binding HasSetSpawn}"/>
+                                        </StackPanel>
+                                        <StackPanel Grid.Column="1" Spacing="2">
+                                            <CheckBox Content="Shift 键潜行" IsChecked="{Binding HasSneak}"/>
+                                            <CheckBox Content="Q 键丢弃物品" IsChecked="{Binding HasDrop}"/>
+                                            <StackPanel Orientation="Horizontal">
+                                                <CheckBox Content="打开物品栏" IsChecked="{Binding HasInventory}"/>
+                                                <ComboBox Width="70" SelectedItem="{Binding InventoryKey}" IsEnabled="{Binding HasInventory}">
+                                                    <x:String>I</x:String>
+                                                    <x:String>E</x:String>
+                                                </ComboBox>
+                                            </StackPanel>
+                                        </StackPanel>
+                                    </Grid>
+                                </StackPanel>
+                            </Border>
+
+                            <Grid Margin="0,10,0,0">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="1*" />
+                                    <ColumnDefinition Width="2*" />
+                                    <ColumnDefinition Width="1*" />
+                                </Grid.ColumnDefinitions>
+                                <!-- 1. 重置按钮 (平时随时可用) -->
+                                <Button Grid.Column="0" 
+                                        Content="重置表单" 
+                                        Background="#555555" 
+                                        Foreground="White" 
+                                        Margin="0,0,5,0" 
+                                        Height="40" 
+                                        FontWeight="Bold"
+                                        HorizontalAlignment="Stretch"
+                                        HorizontalContentAlignment="Center"
+                                        VerticalContentAlignment="Center"
+                                        Command="{Binding ResetFields}"/> <!-- 👈 直接绑定 ViewModel 的方法 -->
+                                <!-- 2. 保存按钮 -->
+                                <Button Grid.Column="1" 
+                                        Content="写入 / 保存版本" 
+                                        Background="#2ecc71" 
+                                        Foreground="White" 
+                                        Margin="5,0,5,0" 
+                                        Height="40" 
+                                        FontWeight="Bold"
+                                        HorizontalAlignment="Stretch"
+                                        HorizontalContentAlignment="Center"
+                                        VerticalContentAlignment="Center"
+                                        Command="{Binding SaveVersionAsync}"/> <!-- 👈 直接绑定 ViewModel 的方法 -->
+                                <!-- 3. 删除按钮 -->
+                                <Button x:Name="BtnDelete"
+                                        Grid.Column="2" 
+                                        Content="删除版本" 
+                                        Background="#e74c3c" 
+                                        Foreground="White" 
+                                        Margin="5,0,0,0" 
+                                        Height="40" 
+                                        FontWeight="Bold"
+                                        HorizontalAlignment="Stretch"
+                                        HorizontalContentAlignment="Center"
+                                        VerticalContentAlignment="Center"
+                                        IsEnabled="{Binding IsExistingVersion}"
+                                        Command="{Binding DeleteVersionAsync}"/>
+                            </Grid>
+                        </StackPanel>
+                    </ScrollViewer>
+
+                    <!-- 右侧：已有版本加载区 -->
+                    <Border Grid.Column="1" Background="#111111" CornerRadius="4" BorderBrush="#222222" BorderThickness="1" Margin="10,0,0,0">
+                        <Grid RowDefinitions="*,Auto,*">
+                            
+                            <!-- 【区域 1：版本列表】 -->
+                            <Grid Grid.Row="0" RowDefinitions="Auto,*" Margin="15">
+                                <TextBlock Grid.Row="0" Text="已有版本列表 (双击修改 / 拖动排序)" FontWeight="Bold" Foreground="#CCCCCC" Margin="0,0,0,10"/>
+                                
+                                <ListBox Grid.Row="1" 
+                                        x:Name="VersionListBox"
+                                        ItemsSource="{Binding VersionKeys}"
+                                        SelectedItem="{Binding SelectedLaunchKey}"
+                                        Background="#1A1A1A" 
+                                        BorderThickness="0"
+                                        DragDrop.AllowDrop="True">
+                                    
+                                    <ListBox.Styles>
+                                        <Style Selector="ListBoxItem">
+                                            <Setter Property="Background" Value="Transparent"/>
+                                            <Setter Property="Template">
+                                                <ControlTemplate>
+                                                    <ContentPresenter Content="{TemplateBinding Content}"
+                                                                    Background="{TemplateBinding Background}"
+                                                                    Padding="10,8"/>
+                                                </ControlTemplate>
+                                            </Setter>
+                                        </Style>
+                                    </ListBox.Styles>
+                                    
+                                    <ListBox.ItemTemplate>
+                                        <DataTemplate>
+                                            <!-- 纯净的样式边框 -->
+                                            <Border Background="#252526" CornerRadius="3" Margin="0,2" Padding="10,6">
+                                                <TextBlock Text="{Binding}" Foreground="#EEEEEE" VerticalAlignment="Center"/>
+                                            </Border>
+                                        </DataTemplate>
+                                    </ListBox.ItemTemplate>
+                                </ListBox>
+                            </Grid>
+                            <!-- 分割线，支持鼠标上下拉伸 -->
+                            <GridSplitter Grid.Row="1" Height="4" Background="#2D2D30" ResizeDirection="Rows" Margin="0"/>
+                            <!-- 【区域 2：实时 JSON 预览】 -->
+                            <Grid Grid.Row="2" RowDefinitions="Auto,*" Margin="15,10,15,15">
+                                <TextBlock Grid.Row="0" Text="实时 JSON 预览 (config/version.json)" FontWeight="Bold" Foreground="#4EC9B0" Margin="0,0,0,8"/>
+                                
+                                <!-- 使用只读的 TextBox 做代码高亮感的容器 -->
+                                <TextBox Grid.Row="1" 
+                                        Text="{Binding VersionJsonPreview, Mode=OneWay}"
+                                        IsReadOnly="True"
+                                        AcceptsReturn="True"
+                                        FontFamily="Consolas, Courier New, monospace"
+                                        FontSize="12"
+                                        Background="#0C0C0C"
+                                        Foreground="#80C670"
+                                        BorderBrush="#252526"
+                                        BorderThickness="1"
+                                        CornerRadius="4"
+                                        ScrollViewer.HorizontalScrollBarVisibility="Auto"
+                                        ScrollViewer.VerticalScrollBarVisibility="Auto"/>
+                            </Grid>
+                            
+                        </Grid>
+                    </Border>
+                </Grid>
+            </TabItem>
+        </TabControl>
+    </DockPanel>
+</Window>
