@@ -26,9 +26,9 @@ jobs:
       with:
         dotnet-version: '9.0.x'
 
-    # 3. 恢复依赖
+    # 3. 恢复依赖（修正：显式指定项目路径）
     - name: Restore dependencies
-      run: dotnet restore
+      run: dotnet restore src/MCAJNLP.csproj # 👈 修改了这里
 
     # 4. 发布（编译并输出到 build 目录）
     - name: Publish App
