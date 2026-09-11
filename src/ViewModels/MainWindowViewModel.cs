@@ -333,7 +333,7 @@ namespace MCAJNLP.ViewModels
             xml.AppendLine("    <param name=\"al_mac\" value=\"LWJGL/macosx_natives.jar\"/>");
             xml.AppendLine("    <param name=\"al_solaris\" value=\"LWJGL/solaris_natives.jar\"/>");
             xml.AppendLine("    <param name=\"al_debug\" value=\"false\"/>");
-            xml.AppendLine("    <param name=\"al_version\" value=\"1.01\"/>");
+            xml.AppendLine("    <param name=\"al_version\" value=\"1.2\"/>");
             xml.AppendLine("    <param name=\"separate_jvm\" value=\"false\"/>");
             xml.AppendLine("    <param name=\"boxmessage\" value=\"Minecraft started\"/>");
             xml.AppendLine("    <param name=\"boxbgcolor\" value=\"#000000\"/>");

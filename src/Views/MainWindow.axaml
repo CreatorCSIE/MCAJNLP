@@ -52,7 +52,7 @@
                     
                     <!-- 双行经典排版 + 高仿超链接 -->
                     <StackPanel VerticalAlignment="Center" Spacing="4">
-                        <TextBlock Text="这是 Minecraft Applet 离线 JNLP 桌面启动器 dev version" FontSize="13"/>
+                        <TextBlock Text="这是 Minecraft Applet 离线 JNLP 桌面启动器 version 1.2" FontSize="13"/>
                         <StackPanel Orientation="Horizontal">
                             <TextBlock Text="如果你想访问本项目的 GitHub 仓库，请点击 " FontSize="12"/>
                             <!-- 触发后台点击事件的超链接按钮 -->
