@@ -21,3 +21,4 @@ src/obj/*
 .DS_Store
 Thumbs.db
 *.log
+*.jnlp

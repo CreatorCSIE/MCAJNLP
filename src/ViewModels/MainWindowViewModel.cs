@@ -134,6 +134,9 @@ namespace MCAJNLP.ViewModels
 
         #region == 启动器业务 (Minecraft.html -> javaws 迁移) ==
 
+        // LWJGL Applet 加载器（位于 LWJGL/lwjgl_util_applet.jar），JNLP 中 applet-desc 的唯一合法入口
+        private const string AppletLoaderClass = "org.lwjgl.util.applet.AppletLoader";
+
         private string _selectedLaunchKey = "";
         public string SelectedLaunchKey
         {
@@ -225,9 +228,17 @@ namespace MCAJNLP.ViewModels
             ControlsText = sb.ToString();
         }
 
-        public void LaunchGame()
+        public async Task LaunchGame()
         {
-            if (!_allConfigs.TryGetValue(SelectedLaunchKey, out var config)) return;
+            if (string.IsNullOrEmpty(SelectedLaunchKey) || !_allConfigs.TryGetValue(SelectedLaunchKey, out var config))
+            {
+                await ShowOwnerCenteredBoxAsync(
+                    "无法启动",
+                    "尚未选择任何游戏版本，请先在【可视化配置管理】中添加并选择一个版本。",
+                    ButtonEnum.Ok,
+                    Icon.Warning);
+                return;
+            }
 
             string rootDir = ConfigManager.GetRootDir();
             string jnlpPath = Path.Combine(rootDir, "Minecraft.jnlp");
@@ -241,6 +252,37 @@ namespace MCAJNLP.ViewModels
 
             string sessionId = new Random().Next(10000000, 99999999).ToString();
             string jarPath = config.Jar;
+
+            // ⭐ 启动前校验：JNLP 中所有 href 都相对 codebase（即 rootDir）解析，
+            var missingFiles = new List<string>();
+            string lwjglDir = Path.Combine(rootDir, "LWJGL");
+            if (!File.Exists(Path.Combine(lwjglDir, "lwjgl_util_applet.jar")))
+            {
+                missingFiles.Add(@"LWJGL\lwjgl_util_applet.jar（Applet 加载器，缺失说明资源根目录推导有误）");
+            }
+            if (string.IsNullOrWhiteSpace(jarPath))
+            {
+                missingFiles.Add("version.json 中该版本的 jar 字段为空");
+            }
+            else
+            {
+                string clientJar = Path.GetFullPath(Path.Combine(rootDir, jarPath.Replace('/', Path.DirectorySeparatorChar)));
+                if (!File.Exists(clientJar))
+                {
+                    missingFiles.Add($"{jarPath}\n  （实际查找位置：{clientJar}）");
+                }
+            }
+            if (missingFiles.Count > 0)
+            {
+                await ShowOwnerCenteredBoxAsync(
+                    "启动前检查未通过",
+                    "以下游戏文件缺失，Java Web Start 无法加载游戏：\n\n· "
+                    + string.Join("\n\n· ", missingFiles)
+                    + "\n\n请按 README 的【客户端 JAR 包放置指引】把 .jar 放到 bin/ 对应子目录后再试。",
+                    ButtonEnum.Ok,
+                    Icon.Warning);
+                return;
+            }
 
             string vmArgs = "-Xmx800M -XX:MaxDirectMemorySize=1024M -Djava.util.Arrays.useLegacyMergeSort=true -Dsun.java2d.uiScale.enabled=false -Dsun.java2d.dpiaware=false -Dorg.lwjgl.util.NoChecks=true";
             string fixArgs = "-Dhttp.proxyHost=betacraft.uk -Dhttp.proxyPort=11702 -Dhttp.nonProxyHosts=api.betacraft.uk|files.betacraft.uk -Dsun.java2d.noddraw=true -Dsun.awt.noerasebackground=true -Dsun.java2d.d3d=false -Dsun.java2d.opengl=false -Dsun.java2d.pmoffscreen=false -Djava.net.useSystemProxies=false";
@@ -281,7 +323,7 @@ namespace MCAJNLP.ViewModels
             xml.AppendLine($"    <j2se version=\"1.8*\" java-vm-args=\"{vmArgs} {fixArgs}\"/>");
             xml.AppendLine("    <jar href=\"LWJGL/lwjgl_util_applet.jar\" />");
             xml.AppendLine("  </resources>");
-            xml.AppendLine($"  <applet-desc name=\"{config.Title}\" main-class=\"{config.MainClass}\" width=\"{config.Width}\" height=\"{config.Height}\">");
+            xml.AppendLine($"  <applet-desc name=\"{config.Title}\" main-class=\"{AppletLoaderClass}\" width=\"{config.Width}\" height=\"{config.Height}\">");
             xml.AppendLine($"    <param name=\"al_title\" value=\"{config.Title}\"/>");
             xml.AppendLine($"    <param name=\"al_main\" value=\"{config.MainClass}\"/>");
             xml.AppendLine("    <param name=\"al_logo\" value=\"bg/logo_small.png\"/>");
@@ -293,7 +335,7 @@ namespace MCAJNLP.ViewModels
             xml.AppendLine("    <param name=\"al_mac\" value=\"LWJGL/macosx_natives.jar\"/>");
             xml.AppendLine("    <param name=\"al_solaris\" value=\"LWJGL/solaris_natives.jar\"/>");
             xml.AppendLine("    <param name=\"al_debug\" value=\"false\"/>");
-            xml.AppendLine("    <param name=\"al_version\" value=\"1.01\"/>");
+            xml.AppendLine("    <param name=\"al_version\" value=\"1.2\"/>");
             xml.AppendLine("    <param name=\"separate_jvm\" value=\"false\"/>");
             xml.AppendLine("    <param name=\"boxmessage\" value=\"Minecraft started\"/>");
             xml.AppendLine("    <param name=\"boxbgcolor\" value=\"#000000\"/>");
@@ -311,7 +353,24 @@ namespace MCAJNLP.ViewModels
             xml.AppendLine("  </applet-desc>");
             xml.AppendLine("</jnlp>");
 
-            File.WriteAllText(jnlpPath, xml.ToString(), Encoding.UTF8);
+            try
+            {
+                // 明确使用无 BOM 的 UTF-8：Encoding.UTF8 会在 <?xml 声明前写入 EF BB BF，
+                // 这会让部分 javaws 版本解析 JNLP 直接失败（且只在独立进程里报错，无法被我们捕获）。
+                File.WriteAllText(jnlpPath, xml.ToString(), new UTF8Encoding(false));
+            }
+            catch (Exception ex)
+            {
+                await ShowOwnerCenteredBoxAsync(
+                    "生成 JNLP 失败",
+                    $"写入描述文件时出错：\n{jnlpPath}\n\n{ex.Message}\n\n"
+                    + "请确认启动器所在目录具有写权限（不要把程序放在 Program Files 等受保护目录）。",
+                    ButtonEnum.Ok,
+                    Icon.Warning);
+                return;
+            }
+
+            Debug.WriteLine($"[Launch] JNLP 已生成: {jnlpPath} | codebase={codebase}");
 
             try
             {
@@ -329,7 +388,13 @@ namespace MCAJNLP.ViewModels
             }
             catch (Exception ex)
             {
-                System.Diagnostics.Debug.WriteLine($"javaws 调用失败: {ex.Message}");
+                await ShowOwnerCenteredBoxAsync(
+                    "调用 javaws 失败",
+                    $"未能唤起 Java Web Start：\n{ex.Message}\n\n"
+                    + "请确认已安装 Java 8（Java 9 及以上已移除 javaws），"
+                    + "或手动将 .jnlp 文件关联到 javaws.exe 后重试。",
+                    ButtonEnum.Ok,
+                    Icon.Warning);
             }
         }
 
