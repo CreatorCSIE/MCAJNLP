@@ -254,7 +254,6 @@ namespace MCAJNLP.ViewModels
             string jarPath = config.Jar;
 
             // ⭐ 启动前校验：JNLP 中所有 href 都相对 codebase（即 rootDir）解析，
-            // 文件缺失时 javaws 只会在自己分离的 GUI 进程里报错，启动器侧表现为“静默失败”。
             var missingFiles = new List<string>();
             string lwjglDir = Path.Combine(rootDir, "LWJGL");
             if (!File.Exists(Path.Combine(lwjglDir, "lwjgl_util_applet.jar")))
@@ -324,8 +323,6 @@ namespace MCAJNLP.ViewModels
             xml.AppendLine($"    <j2se version=\"1.8*\" java-vm-args=\"{vmArgs} {fixArgs}\"/>");
             xml.AppendLine("    <jar href=\"LWJGL/lwjgl_util_applet.jar\" />");
             xml.AppendLine("  </resources>");
-            // main-class 必须是 LWJGL 的 AppletLoader（javaws 只把上面声明的 <jar> 放进 classpath，
-            // MC 客户端 jar 是由 AppletLoader 依据 al_jars 自行加载的），游戏主类只写在 al_main 参数里。
             xml.AppendLine($"  <applet-desc name=\"{config.Title}\" main-class=\"{AppletLoaderClass}\" width=\"{config.Width}\" height=\"{config.Height}\">");
             xml.AppendLine($"    <param name=\"al_title\" value=\"{config.Title}\"/>");
             xml.AppendLine($"    <param name=\"al_main\" value=\"{config.MainClass}\"/>");
