@@ -33,7 +33,14 @@ namespace MCAJNLP.Services
         }
         private static readonly string ConfigPath = Path.Combine(ConfigDirectory, "version.json");
 
-        public static string GetRootDir() => ConfigDirectory;
+        // 游戏资源根目录：LWJGL/、bin/、bg/ 等 JNLP 引用的资源都放在这里，
+        // 也就是 config 目录的上一级（开发时是仓库根目录，发布包里是 exe 同级目录）。
+        // 注意：不能返回 ConfigDirectory，否则生成的 codebase 会让 javaws 去 config/ 下找 jar，导致启动静默失败。
+        public static string GetRootDir()
+        {
+            string parent = Path.GetFullPath(Path.Combine(ConfigDirectory, ".."));
+            return parent.TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar);
+        }
 
         public static Dictionary<string, VersionConfig> LoadConfig()
         {
