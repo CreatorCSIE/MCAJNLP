@@ -134,6 +134,9 @@ namespace MCAJNLP.ViewModels
 
         #region == 启动器业务 (Minecraft.html -> javaws 迁移) ==
 
+        // LWJGL Applet 加载器（位于 LWJGL/lwjgl_util_applet.jar），JNLP 中 applet-desc 的唯一合法入口
+        private const string AppletLoaderClass = "org.lwjgl.util.applet.AppletLoader";
+
         private string _selectedLaunchKey = "";
         public string SelectedLaunchKey
         {
@@ -321,7 +324,9 @@ namespace MCAJNLP.ViewModels
             xml.AppendLine($"    <j2se version=\"1.8*\" java-vm-args=\"{vmArgs} {fixArgs}\"/>");
             xml.AppendLine("    <jar href=\"LWJGL/lwjgl_util_applet.jar\" />");
             xml.AppendLine("  </resources>");
-            xml.AppendLine($"  <applet-desc name=\"{config.Title}\" main-class=\"{config.MainClass}\" width=\"{config.Width}\" height=\"{config.Height}\">");
+            // main-class 必须是 LWJGL 的 AppletLoader（javaws 只把上面声明的 <jar> 放进 classpath，
+            // MC 客户端 jar 是由 AppletLoader 依据 al_jars 自行加载的），游戏主类只写在 al_main 参数里。
+            xml.AppendLine($"  <applet-desc name=\"{config.Title}\" main-class=\"{AppletLoaderClass}\" width=\"{config.Width}\" height=\"{config.Height}\">");
             xml.AppendLine($"    <param name=\"al_title\" value=\"{config.Title}\"/>");
             xml.AppendLine($"    <param name=\"al_main\" value=\"{config.MainClass}\"/>");
             xml.AppendLine("    <param name=\"al_logo\" value=\"bg/logo_small.png\"/>");
