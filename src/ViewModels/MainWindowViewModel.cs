@@ -372,30 +372,55 @@ namespace MCAJNLP.ViewModels
 
             Debug.WriteLine($"[Launch] JNLP 已生成: {jnlpPath} | codebase={codebase}");
 
-            try
+            // 探测本机可用的 javaws（注册表 > 安装目录 > JAVA_HOME > PATH，并逐个用 java -version 验证），
+            // 避免命中卸载残留的转发壳后“点了启动毫无反应”。
+            var candidates = await JavaWebStartLocator.ProbeAsync();
+            string? launchedFrom = null;
+            var failures = new List<string>();
+
+            foreach (JavawsCandidate candidate in candidates)
             {
-                var startInfo = new ProcessStartInfo
+                if (!candidate.IsUsable)
                 {
-                    FileName = "javaws",
-                    WorkingDirectory = rootDir,
-                    UseShellExecute = false,
-                    CreateNoWindow = true
-                };
-                
-                // 使用 ArgumentList 完美解决跨平台路径空格与双引号逃逸问题
-                startInfo.ArgumentList.Add(jnlpPath); 
-                Process.Start(startInfo);
+                    continue;
+                }
+
+                (bool launched, string detail) = await JavaWebStartLocator.TryLaunchAsync(candidate, jnlpPath, rootDir);
+                if (launched)
+                {
+                    launchedFrom = detail;
+                    break;
+                }
+                failures.Add($"{candidate.JavawsPath}\n  {detail}");
             }
-            catch (Exception ex)
+
+            if (launchedFrom is null)
+            {
+                // 自动探测全部失败时，退回到系统 .jnlp 文件关联（交给已注册的 javaws）
+                (bool launched, string detail) = JavaWebStartLocator.LaunchByFileAssociation(jnlpPath, rootDir);
+                if (launched)
+                {
+                    launchedFrom = detail;
+                }
+                else if (detail.StartsWith("文件关联唤起失败"))
+                {
+                    failures.Add(detail);
+                }
+            }
+
+            if (launchedFrom is null)
             {
                 await ShowOwnerCenteredBoxAsync(
-                    "调用 javaws 失败",
-                    $"未能唤起 Java Web Start：\n{ex.Message}\n\n"
-                    + "请确认已安装 Java 8（Java 9 及以上已移除 javaws），"
-                    + "或手动将 .jnlp 文件关联到 javaws.exe 后重试。",
+                    "未能启动 Java Web Start",
+                    "已探测到的 javaws：\n" + JavaWebStartLocator.Describe(candidates)
+                    + (failures.Count > 0 ? "\n\n启动尝试失败：\n" + string.Join("\n", failures) : "")
+                    + "\n\n请安装 64 位 Java 8（自带 javaws），或手动双击上面的 Minecraft.jnlp 用文件关联启动。",
                     ButtonEnum.Ok,
                     Icon.Warning);
+                return;
             }
+
+            Debug.WriteLine($"[Launch] javaws = {launchedFrom}");
         }
 
         #endregion
