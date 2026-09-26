@@ -1,7 +1,8 @@
 > [!IMPORTANT]
-> **系统兼容性提示**：本软件目前仅支持 **Windows** 系统。Linux 平台的移植工作正在紧张进行中，敬请期待！
+> **系统兼容性提示**：本软件目前**仅支持 Windows** 系统。
+> Linux 移植**已暂缓、路线待定**：游戏侧的 LWJGL Linux Natives 与 `al_linux` 参数均已就绪，但 Linux 上没有随 JDK 分发的 Java Web Start（`javaws`）实现，直接依赖各发行版的 IcedTea-Web 并不可靠；我们在评估「自带 JNLP 宿主」等替代路线，确定前不再承诺 Linux 可用性。
 >
-> *Compatibility Notice: Currently, this software only supports **Windows**. The Linux port is actively in progress!*
+> *Compatibility Notice: Currently this software only supports **Windows**. The Linux port is **on hold with its approach still under evaluation** — the LWJGL Linux natives and `al_linux` parameter are already in place, but there is no JDK-shipped Java Web Start (`javaws`) on Linux, so relying on each distro's IcedTea-Web is not dependable.*
 
 # MCAJNLP - Minecraft Applet JNLP 离线启动器
 
@@ -13,9 +14,9 @@
 
 ## 🌟 核心功能特性
 
-- **现代化的跨平台 GUI 界面**：基于 .NET 强类型语言与 Avalonia 框架构建，不仅界面优雅美观，还天生支持在 Windows、Linux 上无缝运行。
+- **现代化的跨平台 GUI 界面**：基于 .NET 强类型语言与 Avalonia 框架构建，不仅界面优雅美观，框架本身也具备跨平台能力（当前发行版仅提供 Windows 产物）。
 - **多阶段历史版本自由管理**：支持 Classic、Indev、Infdev、Alpha、Beta、Release 正式版（直至 1.5.2）以及经典的 [Infinite Map Visualizer](https://minecraft.wiki/w/Infinite_Map_Visualizer) 等距地图预览器。
-- **纯本地 JNLP 一键拉起**：启动器会在本地动态生成符合安全规范的 `.jnlp` 描述文件，全自动配置环境并调用本地 Java Web Start (`javaws`) 运行游戏，摆脱对 Pale Moon 或 IE 等老旧浏览器的依赖。
+- **纯本地 JNLP 一键拉起**：启动器会在本地动态生成符合安全规范的 `.jnlp` 描述文件（写入程序根目录），并**自动探测**本地 Java Web Start (`javaws`)——按注册表、安装目录、`JAVA_HOME`、`PATH` 的优先级寻找候选，再用 `java -version` 逐个验证真实性——全自动配置环境并运行游戏，摆脱对 Pale Moon 或 IE 等老旧浏览器的依赖。
 - **内置全套多平台 Native 运行库（LWJGL）**：
   - 仓库内预置了针对 Windows、Linux、macOS 以及 Solaris 平台的 LWJGL（轻量级 Java 游戏库）二进制 Natives 动态链接库及 JInput 等基础依赖。
 - **图形化配置管理器 (`version.json` / `settings.json`)**：
@@ -25,7 +26,7 @@
 
 ## 📁 客户端 JAR 包放置指引 (Client JAR Placement)
 
-⚠️ **特别说明（版权合规）**：受 DMCA 与版权合规限制，**本 GitHub 仓库不提供、不分发任何官方 Minecraft 游戏 `.jar` 客户端文件**（仓库仅包含 LWJGL 基础依赖与启动器网页源码）。
+⚠️ **特别说明（版权合规）**：受 DMCA 与版权合规限制，**本 GitHub 仓库不提供、不分发任何官方 Minecraft 游戏 `.jar` 客户端文件**（仓库仅包含 LWJGL 基础依赖与启动器源码）。
 
 请自行准备或提取您的 Minecraft 历史版本 `.jar` 文件，并将其放置在 `bin/` 目录下对应的子文件夹中：
 
@@ -44,7 +45,7 @@
 ## 💻 运行环境要求
 
 ### 1. 支持的 Java 运行环境 (JRE)
-- **推荐版本：Java 8**（**推荐使用 32位 或 64位 Java 8 JRE/JDK**）。
+- **推荐版本：Java 8**（**推荐使用 32位 或 64位 Java 8 JRE/JDK**，两者都能运行；启动器探测时会优先选用 64 位的 javaws）。
   * ⚠️ **特别注意**：由于 Oracle 在 Java 9 及之后版本中废弃并移除了 Java Web Start (`javaws`)，若要直接拉起 JNLP，您的电脑上**必须安装有 Java 8 或更早版本的 JRE**。
 - **归档支持：Java 6 ~ Java 7**（对于部分极端怀旧、在 Java 8 下有渲染 Bug 的早期 Applet，可考虑使用较低版本）。
 
@@ -76,7 +77,7 @@ dotnet run --project src/MCAJNLP.csproj
 1. 前往 [Releases 页面](https://github.com/CreatorCSIE/MCAJNLP/releases) 下载适合您系统架构的最新压缩包。
 2. 解压压缩包到本地任意目录（路径最好不要含有中文或特殊字符）。
 3. 按照 [【客户端 JAR 包放置指引】](#-客户端-jar-包放置指引-client-jar-placement) 将游戏 JAR 放入对应的 `bin/` 子目录。
-4. 双击运行 `MCAJNLP.exe`（Windows）或执行 `./MCAJNLP`（Linux）。
+4. 双击运行 `MCAJNLP.exe`（目前仅支持 Windows）。
 5. 在 GUI 界面中选择您想体验的版本，输入离线游戏 ID，点击 **【启动 / Launch】** 即可。
 
 ---
@@ -106,9 +107,18 @@ dotnet run --project src/MCAJNLP.csproj
   permission java.security.AllPermission;
   ```
 
-### 2. 提示找不到 `javaws` 或 JNLP 无法关联打开
-- 请确认您的默认 Java 环境是 **Java 8 (JRE 1.8)** 或更早版本，并在安装时勾选了“关联 `.jnlp` 文件”选项。
-- 如果系统中存在多个 Java 版本导致关联混乱，可以在启动器设置中手动指定 `javaws.exe`（通常位于 `C:\Program Files\Java\jre1.8.x_xxx\bin\javaws.exe`）的绝对路径。
+### 2. 提示找不到 `javaws`，或点击【启动游戏】后没有任何反应
+启动器内置 **javaws 探针**，不依赖系统 `PATH` 的先后顺序：
+
+- **探测顺序**：注册表（`HKLM\SOFTWARE\JavaSoft\Java Web Start / Java Runtime Environment / Java Development Kit`，先 64 位视图、再 32 位视图）→ 安装目录扫描（`Program Files` 优先于 `Program Files (x86)`，覆盖 `Java`、Adoptium、Corretto、Zulu、Semeru 等厂商目录）→ `JAVA_HOME` / `JDK_HOME` → `PATH`。
+- **候选必须实测**：每个候选都会用同目录下的 `java.exe -version` 校验，要求能真实输出版本号且为 Java 8。因此**卸载残留的转发壳会被自动跳过**（典型症状是同目录 `java.exe` 直接以 `0xC0000005` 崩溃，表现为“点了启动没进程”）。
+- **启动与回退**：按优先级逐个试运行选出的 javaws，若某个进程创建后立即以非 0 退出码结束则换下一个；全部不可用时兜底交给系统 `.jnlp` 文件关联；仍失败会弹窗列出**完整探测表与被拒原因**。
+- **玩家可以自行处理**：安装 **64 位 Java 8**（Oracle JRE，或任何自带 `javaws` 的 JDK 8）；或将 `JAVA_HOME` 指向该 JRE/JDK 根目录；或直接双击程序根目录下的 `Minecraft.jnlp` 手动唤起。
+
+### 3. 升级后游戏仍打不开（JNLP 与 LWJGL 缓存）
+- 启动器生成的描述文件固定是**程序根目录**下的 `Minecraft.jnlp`（自 1.2 起不再写入 `config\` 子目录），其 `codebase` 同样指向该根目录；旧版本遗留在 `config\` 里的同名文件属于失效残留，可直接删除。
+- 从 1.0 / 1.1 升级上来的玩家请先清理 LWJGL 缓存：`Win + R` → 输入 `%TEMP%` → 删除其中的 `lwjglcache` 文件夹后重试。
+- 若提示 jar 缺失，请对照弹窗中列出的**实际查找位置**检查 `version.json` 里的 `jar` 字段与 `bin/` 下的文件名是否一致。
 
 ---
 
