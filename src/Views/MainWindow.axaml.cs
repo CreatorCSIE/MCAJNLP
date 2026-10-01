@@ -50,7 +50,7 @@ namespace MCAJNLP.Views
 
         private void OpenGitHub_Click(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
         {
-            string url = "https://github.com/Hawk/MCAHTML"; 
+            string url = "https://github.com/CreatorCSIE/MCAJNLP"; 
             try
             {
                 if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
